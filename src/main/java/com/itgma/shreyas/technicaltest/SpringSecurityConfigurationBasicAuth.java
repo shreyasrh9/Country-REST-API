@@ -13,11 +13,10 @@ public class SpringSecurityConfigurationBasicAuth extends WebSecurityConfigurerA
 	protected void configure(HttpSecurity http) throws Exception {
 		http
         .authorizeRequests().
-//        antMatchers("/console/**").
-        antMatchers(HttpMethod.OPTIONS,"/**").
+        antMatchers(HttpMethod.OPTIONS,"/**", "/console/**").
         permitAll().anyRequest().authenticated()
         .and()
-        .formLogin();
+        .httpBasic();
 		http.csrf().disable();
 		http.headers().frameOptions().disable();
 	}

@@ -36,7 +36,7 @@ public class CountryController {
 	 */
 
 	@RequestMapping(method = RequestMethod.GET, path = "/countries")
-	public List<Country> retrieveAllCountries() {
+	public List<Country> getAllCountries() {
 		final String uri = "https://restcountries.eu/rest/v2/all";
 		RestTemplate restTemplate = new RestTemplate();
 		String result = restTemplate.getForObject(uri, String.class);
@@ -79,9 +79,9 @@ public class CountryController {
 	 */
 
 	@RequestMapping(method = RequestMethod.POST, path = "/favourite-countries")
-	public ResponseEntity<Object> addFavouriteCountries(@RequestBody Country country) {
+	public ResponseEntity<Object> addFavouriteCountry(@RequestBody Country country) {
 		System.out.println(country);
-		Country savedCountry = countryService.save(country);
+		Country savedCountry = countryService.addFavouriteCountry(country);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(savedCountry.getId()).toUri();
@@ -93,8 +93,8 @@ public class CountryController {
 	 */
 
 	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries")
-	public List<Country> favouriteCountries() {
-		return countryService.findAll();
+	public List<Country> getFavouriteCountries() {
+		return countryService.getFavouriteCountries();
 	}
 	
 	/*
@@ -111,8 +111,8 @@ public class CountryController {
 	 */
 
 	@RequestMapping(method = RequestMethod.DELETE, path = "/favourite-countries/{id}")
-	public void deleteFavouriteCountry(@PathVariable int id) {
-		countryService.deleteById(id);
+	public void deleteFavouriteCountryById(@PathVariable int id) {
+		countryService.deleteFavouriteCountryById(id);
 	}
 	
 	

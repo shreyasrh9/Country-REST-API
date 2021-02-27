@@ -15,19 +15,19 @@ public class CountryServiceImpl implements CountryService{
 	private CountryRepository countryRepository;
 	
 	@Override
-	public Country save(Country country) {
+	public Country addFavouriteCountry(Country country) {
 		// TODO Auto-generated method stub
 		return countryRepository.save(country);
 	}
 
 	@Override
-	public List<Country> findAll() {
+	public List<Country> getFavouriteCountries() {
 		// TODO Auto-generated method stub
 		return countryRepository.findAll();
 	}
 
 	@Override
-	public void deleteById(int id) {
+	public void deleteFavouriteCountryById(int id) {
 		// TODO Auto-generated method stub
 		countryRepository.deleteById(id);
 	}

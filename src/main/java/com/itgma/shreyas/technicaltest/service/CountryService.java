@@ -5,8 +5,8 @@ import java.util.List;
 import com.itgma.shreyas.technicaltest.country.Country;
 
 public interface CountryService {
-	public Country save(Country country);
-	public List<Country> findAll();
-	public void deleteById(int id);
 	public List<Country> getFavouriteCountryByRegionName(String regionName);
+	public Country addFavouriteCountry(Country country);
+	public List<Country> getFavouriteCountries();
+	public void deleteFavouriteCountryById(int id);
 }
