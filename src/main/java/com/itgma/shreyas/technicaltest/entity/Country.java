@@ -1,4 +1,4 @@
-package com.itgma.shreyas.technicaltest.country;
+package com.itgma.shreyas.technicaltest.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -91,6 +91,24 @@ public class Country {
 	}
 
 	public void setDefaultLanguagesName(String defaultLanguagesName) {
+		this.defaultLanguagesName = defaultLanguagesName;
+	}
+	
+	public Country() {
+		
+	}
+	
+	public Country(Integer id, String countryName, String countryCapital, String countryRegion,
+			String defaultCurrencyCode, String defaultCurrencyName, String defaultCurrencySymbol,
+			String defaultLanguagesName) {
+		super();
+		this.id = id;
+		this.countryName = countryName;
+		this.countryCapital = countryCapital;
+		this.countryRegion = countryRegion;
+		this.defaultCurrencyCode = defaultCurrencyCode;
+		this.defaultCurrencyName = defaultCurrencyName;
+		this.defaultCurrencySymbol = defaultCurrencySymbol;
 		this.defaultLanguagesName = defaultLanguagesName;
 	}
 	
