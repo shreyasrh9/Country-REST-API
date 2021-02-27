@@ -1,4 +1,4 @@
-package com.itgma.shreyas.technicaltest.country;
+package com.itgma.shreyas.technicaltest.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

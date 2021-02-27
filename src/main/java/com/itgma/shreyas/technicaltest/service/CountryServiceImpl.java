@@ -1,13 +1,12 @@
 package com.itgma.shreyas.technicaltest.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.itgma.shreyas.technicaltest.country.Country;
 import com.itgma.shreyas.technicaltest.country.repositories.CountryRepository;
+import com.itgma.shreyas.technicaltest.entity.Country;
 
 @Service
 public class CountryServiceImpl implements CountryService{
@@ -16,26 +15,21 @@ public class CountryServiceImpl implements CountryService{
 	
 	@Override
 	public Country addFavouriteCountry(Country country) {
-		// TODO Auto-generated method stub
 		return countryRepository.save(country);
 	}
 
 	@Override
 	public List<Country> getFavouriteCountries() {
-		// TODO Auto-generated method stub
 		return countryRepository.findAll();
 	}
 
 	@Override
-	public void deleteFavouriteCountryById(int id) {
-		// TODO Auto-generated method stub
-		countryRepository.deleteById(id);
-	}
-
-	@Override
-	public List<Country> getFavouriteCountryByRegionName(String regionName) {
-		// TODO Auto-generated method stub
+	public List<Country> getFavouriteCountriesByRegionName(String regionName) {
 		return countryRepository.findByCountryRegion(regionName);
 	}
 
+	@Override
+	public void deleteFavouriteCountryByCountryName(String countryName) {
+		countryRepository.deleteByCountryName(countryName);
+	}
 }

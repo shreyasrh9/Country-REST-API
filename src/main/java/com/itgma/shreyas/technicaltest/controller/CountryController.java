@@ -10,6 +10,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,26 +23,29 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.itgma.shreyas.technicaltest.country.Country;
+import com.itgma.shreyas.technicaltest.entity.Country;
 import com.itgma.shreyas.technicaltest.service.CountryService;
-
 
 @RestController
 public class CountryController {
-
 	@Autowired
 	private CountryService countryService;
-	
+	private static final String URI = "https://restcountries.eu/rest/v2/";
+	private static final String ALL = "all/";
+	private static final String REGION = "region/";
+	private RestTemplate restTemplate = new RestTemplate();
+
+	Logger logger = LoggerFactory.getLogger(CountryController.class);
+
 	/*
 	 * GET method - "Retrieve all countries from https://restcountries.eu/"
 	 */
 
 	@RequestMapping(method = RequestMethod.GET, path = "/countries")
 	public List<Country> getAllCountries() {
-		final String uri = "https://restcountries.eu/rest/v2/all";
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject(uri, String.class);
-		return getCountryListFromJson(result);
+		String response = restTemplate.getForObject(URI + ALL, String.class);
+		return getCountryListFromJson(response);
 	}
 
 	/*
@@ -49,17 +54,14 @@ public class CountryController {
 
 	@RequestMapping(method = RequestMethod.GET, path = "/countries/{region}")
 	public List<Country> filterCountriesBasedOnRegion(@PathVariable String region) {
-		final String uri = "https://restcountries.eu/rest/v2/region/" + region;
-		String result = null;
-		RestTemplate restTemplate = new RestTemplate();
-
+		String response = null;
 		try {
-			result = restTemplate.getForObject(uri, String.class);
+			response = restTemplate.getForObject(URI + REGION + region, String.class);
 		} catch (HttpClientErrorException.NotFound ex) {
 			return Collections.EMPTY_LIST;
 		}
 
-		return getCountryListFromJson(result);
+		return getCountryListFromJson(response);
 	}
 
 	/*
@@ -68,21 +70,17 @@ public class CountryController {
 
 	@RequestMapping(method = RequestMethod.GET, path = "/countries/count")
 	public Map<String, Integer> getCountriesCountBasedOnRegion() {
-		final String uri = "https://restcountries.eu/rest/v2/all";
-		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject(uri, String.class);
-		return getCountriesCount(result);
+		String response = restTemplate.getForObject(URI + ALL, String.class);
+		return getCountryCountByRegion(response);
 	}
 
 	/*
 	 * Post method - "Add favourite country to DB"
 	 */
 
-	@RequestMapping(method = RequestMethod.POST, path = "/favourite-countries")
+	@RequestMapping(method = RequestMethod.POST, path = "/favourite-countries/add")
 	public ResponseEntity<Object> addFavouriteCountry(@RequestBody Country country) {
-		System.out.println(country);
 		Country savedCountry = countryService.addFavouriteCountry(country);
-
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(savedCountry.getId()).toUri();
 		return ResponseEntity.created(location).build();
@@ -92,35 +90,37 @@ public class CountryController {
 	 * GET method - "Retrieve favourite countries from DB"
 	 */
 
-	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries")
+	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries/fetch")
 	public List<Country> getFavouriteCountries() {
 		return countryService.getFavouriteCountries();
 	}
-	
+
 	/*
 	 * GET method - "Retrieve favourite country by Id from DB"
 	 */
 
-	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries/{regionName}")
-	public List<Country> getFavouriteCountryByRegionName(@PathVariable String regionName) {
-		return countryService.getFavouriteCountryByRegionName(regionName);
+	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries/fetch/{regionName}")
+	public List<Country> getFavouriteCountriesByRegionName(@PathVariable String regionName) {
+		return countryService.getFavouriteCountriesByRegionName(regionName);
 	}
 
 	/*
 	 * Delete method - "Delete favourite country from DB"
 	 */
 
-	@RequestMapping(method = RequestMethod.DELETE, path = "/favourite-countries/{id}")
-	public void deleteFavouriteCountryById(@PathVariable int id) {
-		countryService.deleteFavouriteCountryById(id);
+	@RequestMapping(method = RequestMethod.DELETE, path = "/favourite-countries/delete/{countryName}")
+	public void deleteFavouriteCountryByCountryName(@PathVariable String countryName) {
+		countryService.deleteFavouriteCountryByCountryName(countryName);
 	}
-	
-	
-	private List<Country> getCountryListFromJson(String result) {
+
+	private List<Country> getCountryListFromJson(String response) {
 		List<Country> countriesList = new ArrayList<>();
 		try {
 			
-			JSONArray countryJsonArray = new JSONArray(result);
+			
+			// Extract the list of countries from the response
+			 
+			JSONArray countryJsonArray = new JSONArray(response);
 
 			for (int i = 0; i < countryJsonArray.length(); i++) {
 				Country country = new Country();
@@ -137,16 +137,18 @@ public class CountryController {
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("getCountryListFromJson : " + e.getStackTrace());
 		}
 		return countriesList;
 	}
-	
-	private Map<String, Integer> getCountriesCount(String result) {
+
+	private Map<String, Integer> getCountryCountByRegion(String response) {
 		Map<String, Integer> countryCount = new HashMap<>();
 		try {
-			JSONArray countryJsonArray = new JSONArray(result);
+			
+			// Extract and calculate the number of countries in a region
+			
+			JSONArray countryJsonArray = new JSONArray(response);
 
 			for (int i = 0; i < countryJsonArray.length(); i++) {
 				JSONObject objects = countryJsonArray.getJSONObject(i);
@@ -161,11 +163,10 @@ public class CountryController {
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("getCountryCountByRegion : " + e.getStackTrace());
 		}
-		
+
 		return countryCount;
 	}
-	
+
 }
