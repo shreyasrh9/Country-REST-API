@@ -22,14 +22,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.itgma.shreyas.technicaltest.country.Country;
-import com.itgma.shreyas.technicaltest.country.repositories.CountryRepository;
+import com.itgma.shreyas.technicaltest.service.CountryService;
 
 
 @RestController
 public class CountryController {
 
 	@Autowired
-	private CountryRepository countryRepository;
+	private CountryService countryService;
 	
 	/*
 	 * GET method - "Retrieve all countries from https://restcountries.eu/"
@@ -81,7 +81,7 @@ public class CountryController {
 	@RequestMapping(method = RequestMethod.POST, path = "/favourite-countries")
 	public ResponseEntity<Object> addFavouriteCountries(@RequestBody Country country) {
 		System.out.println(country);
-		Country savedCountry = countryRepository.save(country);
+		Country savedCountry = countryService.save(country);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(savedCountry.getId()).toUri();
@@ -94,7 +94,16 @@ public class CountryController {
 
 	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries")
 	public List<Country> favouriteCountries() {
-		return countryRepository.findAll();
+		return countryService.findAll();
+	}
+	
+	/*
+	 * GET method - "Retrieve favourite country by Id from DB"
+	 */
+
+	@RequestMapping(method = RequestMethod.GET, path = "/favourite-countries/{regionName}")
+	public List<Country> getFavouriteCountryByRegionName(@PathVariable String regionName) {
+		return countryService.getFavouriteCountryByRegionName(regionName);
 	}
 
 	/*
@@ -103,7 +112,7 @@ public class CountryController {
 
 	@RequestMapping(method = RequestMethod.DELETE, path = "/favourite-countries/{id}")
 	public void deleteFavouriteCountry(@PathVariable int id) {
-		countryRepository.deleteById(id);
+		countryService.deleteById(id);
 	}
 	
 	

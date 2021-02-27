@@ -94,5 +94,23 @@ public class Country {
 		this.defaultLanguagesName = defaultLanguagesName;
 	}
 	
+	public Country() {
+		
+	}
+	
+	public Country(Integer id, String countryName, String countryCapital, String countryRegion,
+			String defaultCurrencyCode, String defaultCurrencyName, String defaultCurrencySymbol,
+			String defaultLanguagesName) {
+		super();
+		this.id = id;
+		this.countryName = countryName;
+		this.countryCapital = countryCapital;
+		this.countryRegion = countryRegion;
+		this.defaultCurrencyCode = defaultCurrencyCode;
+		this.defaultCurrencyName = defaultCurrencyName;
+		this.defaultCurrencySymbol = defaultCurrencySymbol;
+		this.defaultLanguagesName = defaultLanguagesName;
+	}
+	
 	
 }
